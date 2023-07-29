@@ -17,7 +17,7 @@ impl @vctr {
                 let v = get_value(curr_index, range);
                 array[v] = n;
                 curr_index++;
-            }, 
+            },
             display: (let x: @number, y: @number, spacing: @number = 45) {
                 for i in array {
                     i.display(x, y);
@@ -45,17 +45,18 @@ impl @vctr {
         };
 
         return opts;
-    }, from: (input) {
+    },
+    from: (input) {
         length = input.length - 1
         let curr_index = counter(0);
         let array = [];
-        
+
         let range = 0..length + 1;
-        
+
         for i in range {
             array.push(counter(input[i]));
         }
-        
+
         let opts = {
             push: (n) {
                 let v = get_value(curr_index, range);
@@ -85,101 +86,102 @@ impl @vctr {
     }
 }
 
-decimalToBinary = (binaryRepresentation, let decimalNumber) {
-  while_loop(() => decimalNumber > 0, () {
-    remainder = counter(decimalNumber % 2);
-    binaryRepresentation.push(remainder);
-    
-    decimalNumber = (decimalNumber - remainder) / 2;
-  })
+decimalToBinary = (binaryRepresentation,
+    let decimalNumber) {
+    while_loop(() => decimalNumber > 0, () {
+        remainder = counter(decimalNumber % 2);
+        binaryRepresentation.push(remainder);
 
-  return binaryRepresentation;
+        decimalNumber = (decimalNumber - remainder) / 2;
+    })
+
+    return binaryRepresentation;
 }
 
 // KEYPAD START
 create_keypad = (inputs_amount = 1, callback) {
-let keypstart = [30 * 3, 50 * 3];
-let input = counter(0);
-input.display(45 * 3, 150 + 20 * 3);
-    
-let color = ?c;
-let group = ?g;
+    let keypstart = [30 * 3, 50 * 3];
+    let input = counter(0);
+    input.display(45 * 3, 150 + 20 * 3);
 
-$.add(obj {
-    OBJ_ID: 211,
-    X: keypstart[0],
-    Y: keypstart[1],
-    COLOR: color,
-    GROUPS: group
-})
+    let color = ?c;
+    let group = ?g;
 
-for i in 0..10 {
+    $.add(obj {
+        OBJ_ID: 211,
+        X: keypstart[0],
+        Y: keypstart[1],
+        COLOR: color,
+        GROUPS: group
+    })
+
+    for i in 0..10 {
         if (i == 3 || i == 6 || i == 9) {
             keypstart[1] -= 15 * 3;
             keypstart[0] = 30 * 3;
         }
         $.add((i as @string).to_obj().with(X, keypstart[0]).with(Y, keypstart[1]));
         keypstart[0] += 15 * 3;
-}
-                
-color.set(rgb8(0, 255, 0));
+    }
 
-let touching_nondual = counter(false);
-let clicks = counter(0);
-let params = (' ' * (inputs_amount - 1)).split(' ').map(x => counter(0));
+    color.set(rgb8(0, 255, 0));
 
-                on(touch(), !{
-                    touching_nondual = true
-                    group.move(15, 0);
-                    if (clicks == 2 || clicks == 5 || clicks == 8) {
-                        group.move(-45, -15);
-                    } else if (clicks == 11) {
-                        group.move(-45, 45)
-                        clicks = 0;
-                        clicks--;
-                    }
-                    clicks++;
-                })
+    let touching_nondual = counter(false);
+    let clicks = counter(0);
+    let params = (' ' * (inputs_amount - 1)).split(' ').map(x => counter(0));
 
-                on(touch_end(), !{
-                    touching_nondual = false;
-                })
+    on(touch(), !{
+        touching_nondual = true
+        group.move(15, 0);
+        if (clicks == 2 || clicks == 5 || clicks == 8) {
+            group.move(-45, -15);
+        } else if (clicks == 11) {
+            group.move(-45, 45)
+            clicks = 0;
+            clicks--;
+        }
+        clicks++;
+    })
 
-                let times_dualed = counter(0);
-                let fillparam = counter(0);
+    on(touch_end(), !{
+        touching_nondual = false;
+    })
 
-
-                on(touch(dual_side = true), !{
-                    if !@bool(touching_nondual) {
-                        if (times_dualed == 0) {
-                            input += clicks;
-                            times_dualed++;
-                        } else if (clicks <= 9) {
-                            input *= 10;
-                            input += clicks;
-                            times_dualed++;
-                        } else if (clicks == 10) {
-                            x = get_value(fillparam, 0..2);
-                            
-                            params[x] += input;
-                            input = 0;
-                            fillparam++;
-                        } else if (clicks == 11) {
-                            callback(params);
-                        }
-                    }
-                })
+    let times_dualed = counter(0);
+    let fillparam = counter(0);
 
 
-                let params_pos = [75 * 3, 50 * 3];
-                for i in 0..params.length {
-                    $.add(("Param " + (i + 1) as @string).to_obj().with(X, params_pos[0]).with(Y, params_pos[1] + (3 * 3)).with(SCALING, 0.25))
-                    params[i].display(params_pos[0], params_pos[1]);
-                    params_pos[1] -= 15 * 3;
-                }
+    on(touch(dual_side = true), !{
+        if !@bool(touching_nondual) {
+            if (times_dualed == 0) {
+                input += clicks;
+                times_dualed++;
+            } else if (clicks <= 9) {
+                input *= 10;
+                input += clicks;
+                times_dualed++;
+            } else if (clicks == 10) {
+                x = get_value(fillparam, 0..2);
 
-                $.add("OK".to_obj().with(X, (30 * 3) + 15 * 3).with(Y, 15).with(SCALING, 0.7));
-                $.add("RUN".to_obj().with(X, (30 * 3) + 30 * 3).with(Y, 15).with(SCALING, 0.6));
+                params[x] += input;
+                input = 0;
+                fillparam++;
+            } else if (clicks == 11) {
+                callback(params);
+            }
+        }
+    })
+
+
+    let params_pos = [75 * 3, 50 * 3];
+    for i in 0..params.length {
+        $.add(("Param " + (i + 1) as @string).to_obj().with(X, params_pos[0]).with(Y, params_pos[1] + (3 * 3)).with(SCALING, 0.25))
+        params[i].display(params_pos[0], params_pos[1]);
+        params_pos[1] -= 15 * 3;
+    }
+
+    $.add("OK".to_obj().with(X, (30 * 3) + 15 * 3).with(Y, 15).with(SCALING, 0.7));
+    $.add("RUN".to_obj().with(X, (30 * 3) + 30 * 3).with(Y, 15).with(SCALING, 0.6));
 }
 
 
@@ -203,7 +205,7 @@ bin_to_dec = (bin) {
 create_keypad(2, (params) {
     decimalToBinary(bin_a, params[0])
     decimalToBinary(bin_b, params[1])
-    
+
     for i in 0..bin_a.array.length {
         let bit1 = bin_a.array[i];
         let bit2 = bin_b.array[i];
@@ -211,6 +213,6 @@ create_keypad(2, (params) {
             bin_c.array[i] = 1;
         }
     }
-    
+
     bin_to_dec(bin_c);
 });
